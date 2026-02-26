@@ -1,0 +1,55 @@
+### 1️.. Register a New User
+
+### This will create user & send OTP
+
+
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "mohitpurohit9636@gmail.com",
+  "password": "123456"
+}
+
+### 2️.. Verify Email (Complete Registration)
+### Check terminal/email for OTP
+
+POST http://localhost:5000/api/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "mohitpurohit9636@gmail.com",
+  "otp": "123456"
+}
+
+### 3️. Normal Login
+
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "your-real-email@gmail.com",
+  "password": "mySecurePassword123"   // 
+
+}
+
+### 4️. Forgot Password   
+
+POST http://localhost:5000/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "your-real-email@gmail.com"
+}
+
+### 5️. Reset Password
+
+POST http://localhost:5000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "your-real-email@gmail.com",
+  "otp": "654321",
+  "newPassword": "newPassword456"
+}
