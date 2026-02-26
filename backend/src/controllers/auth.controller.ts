@@ -60,6 +60,7 @@ export const verifyRegistration = async (req: Request, res: Response): Promise<v
     }
 
     const isMatch = await otpRecord.compareOtp(otp);
+
     if (!isMatch) {
       res.status(400).json({ message: 'Invalid OTP' });
       return;
@@ -126,16 +127,12 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Generate a new 6-digit OTP
     const otp = generateOTP();
 
-    // Delete any existing OTPs for this email to prevent conflicts
     await Otp.deleteMany({ email });
 
-    // Save the new OTP to the database (it will hash automatically via the model hook and expire in 5 mins)
     await Otp.create({ email, otp });
 
-    // Send the password reset email
     await sendPasswordResetEmail(email, otp);
 
     res.status(200).json({ message: 'Password reset OTP has been sent to your email.' });
