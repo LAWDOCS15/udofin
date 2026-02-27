@@ -7,12 +7,20 @@ import { Progress } from "@/components/ui/progress"
 import { CheckCircle2, Loader2, ShieldCheck, ArrowRight, Fingerprint, BarChart3, FileSearch, Scale, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+// const verificationSteps = [
+//   { label: "Identity Verification (KYC)", desc: "Checking government databases", icon: Fingerprint, duration: 2000 },
+//   { label: "CKYC Database Check", desc: "Central KYC registry lookup", icon: FileSearch, duration: 1800 },
+//   { label: "CIBIL Score Retrieval", desc: "Fetching credit history", icon: BarChart3, duration: 2200 },
+//   { label: "Cross-Verification", desc: "Document consistency check", icon: Lock, duration: 1600 },
+//   { label: "Risk Assessment", desc: "Calculating eligibility", icon: Scale, duration: 1400 },
+// ]
+
 const verificationSteps = [
-  { label: "Identity Verification (KYC)", desc: "Checking government databases", icon: Fingerprint, duration: 2000 },
-  { label: "CKYC Database Check", desc: "Central KYC registry lookup", icon: FileSearch, duration: 1800 },
-  { label: "CIBIL Score Retrieval", desc: "Fetching credit history", icon: BarChart3, duration: 2200 },
-  { label: "Cross-Verification", desc: "Document consistency check", icon: Lock, duration: 1600 },
-  { label: "Risk Assessment", desc: "Calculating eligibility", icon: Scale, duration: 1400 },
+  { label: "Identity Verification (KYC)", desc: "Checking government databases", icon: Fingerprint, duration: 500 },
+  { label: "CKYC Database Check", desc: "Central KYC registry lookup", icon: FileSearch, duration: 500 },
+  { label: "CIBIL Score Retrieval", desc: "Fetching credit history", icon: BarChart3, duration: 500 },
+  { label: "Cross-Verification", desc: "Document consistency check", icon: Lock, duration: 500 },
+  { label: "Risk Assessment", desc: "Calculating eligibility", icon: Scale, duration: 500 },
 ]
 
 export function VerificationScreen() {
