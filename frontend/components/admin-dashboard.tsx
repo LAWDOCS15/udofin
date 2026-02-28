@@ -369,11 +369,11 @@ export function AdminDashboard() {
           <div className="flex items-center gap-4">
             
             {/* NEW: Add Partner Button */}
-            <Button 
-              onClick={() => setShowAddPartnerModal(true)}
-              className="hidden md:flex gap-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg shadow-sm"
-            >
-              <Plus className="h-4 w-4" /> Add Partner
+           <Button 
+      onClick={() => setShowAddPartnerModal(true)}
+      className="flex gap-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg shadow-sm"
+        >
+         <Plus className="h-4 w-4" /> Add Partner
             </Button>
 
             <div className="h-6 w-px bg-slate-200 mx-2 hidden md:block"></div>
