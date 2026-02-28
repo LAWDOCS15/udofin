@@ -327,7 +327,7 @@ export function AdminDashboard() {
 
       if (!nbfcRes.ok) throw new Error(nbfcData.message || 'Failed to create NBFC')
 
-      const newNbfcId = nbfcData.nbfc._id
+        const newNbfcId = nbfcData.nbfcId
 
       // Step 2: Create the Admin User linked to this NBFC
       const adminRes = await fetch('http://localhost:5000/api/admin/create-nbfc-admin', {
@@ -654,7 +654,7 @@ export function AdminDashboard() {
                       type="password" 
                       placeholder="Set Admin Password" 
                       required
-                      minLength={6}
+                      minLength={8}
                       value={partnerForm.adminPassword}
                       onChange={(e) => setPartnerForm({...partnerForm, adminPassword: e.target.value})}
                       className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"

@@ -528,6 +528,7 @@ export const verifyRegistration = async (
 
   //  LOGIN
 
+
 export const loginUser = async (
   req: Request,
   res: Response
@@ -584,12 +585,19 @@ console.log("Login body:", req.body);
 
     await Otp.deleteMany({ email: normalizedEmail });
     await Otp.create({ email: normalizedEmail, otp });
-
-    if (otpMethod === 'sms') {
-      await sendSmsOtp(user.phoneNumber, otp);
-    } else {
-      await sendEmailOtp(user.email, otp);
-    }
+if (otpMethod === 'sms') {
+  if (user.phoneNumber) {
+    await sendSmsOtp(user.phoneNumber, otp);
+  } else {
+    console.log('\n===== OTP (No Phone Number - Console Fallback) =====');
+    console.log(`Email: ${user.email}`);
+    console.log(`OTP: ${otp}`);
+    console.log('Valid for 60 seconds');
+    console.log('=====================================\n');
+  }
+} else {
+  await sendEmailOtp(user.email, otp);
+}
 
     res.status(200).json({
       message: 'OTP sent successfully.',
@@ -683,49 +691,6 @@ export const logoutUser = (
   res.status(200).json({ message: 'Logged out successfully.' });
 };
 
-
-  //  FORGOT PASSWORD
-
-export const forgotPassword = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      res.status(400).json({ message: 'Email required.' });
-      return;
-    }
-
-    const normalizedEmail = normalizeEmail(email);
-
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      res.status(200).json({
-        message: 'If account exists, OTP sent.',
-      });
-      return;
-    }
-
-    const otp = generateOTP();
-
-    await Otp.deleteMany({ email: normalizedEmail });
-    await Otp.create({ email: normalizedEmail, otp });
-
-    await sendPasswordResetEmail(normalizedEmail, otp);
-
-    res.status(200).json({
-      message: 'If account exists, OTP sent.',
-    });
-
-  } catch (error) {
-    console.error('Forgot Password Error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
   //  RESET PASSWORD
 
 export const resetPassword = async (
@@ -784,6 +749,88 @@ export const resetPassword = async (
 
   } catch (error) {
     console.error('Reset Password Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// 🔄 5. RESEND OTP (STRICT METHOD)
+export const resendOtp = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, otpMethod } = req.body;
+
+    if (!email) {
+      res.status(400).json({ message: 'Email required.' });
+      return;
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found.' });
+      return;
+    }
+
+    const otp = generateOTP();
+    await Otp.deleteMany({ email: normalizedEmail });
+    await Otp.create({ email: normalizedEmail, otp });
+
+
+    if (otpMethod === 'sms') {
+      if (user.phoneNumber) {
+        await sendSmsOtp(user.phoneNumber, otp);
+      } else {
+        console.log('\n===== RESEND OTP (No Phone Number - Console Fallback) =====');
+        console.log(`Email: ${user.email} | OTP: ${otp} | Valid for 60 seconds`);
+        console.log('=====================================\n');
+      }
+    } else {
+      await sendEmailOtp(normalizedEmail, otp);
+    }
+
+    res.status(200).json({ message: `New OTP sent successfully via ${otpMethod.toUpperCase()}.` });
+  } catch (error) {
+    console.error('Resend OTP Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// 🔑 7. FORGOT PASSWORD (STRICT METHOD)
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, otpMethod } = req.body; 
+    if (!email) {
+      res.status(400).json({ message: 'Email required.' });
+      return;
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      res.status(200).json({ message: 'If account exists, OTP sent.' });
+      return;
+    }
+
+    const otp = generateOTP();
+    await Otp.deleteMany({ email: normalizedEmail });
+    await Otp.create({ email: normalizedEmail, otp });
+
+    if (otpMethod === 'sms') {
+      if (user.phoneNumber) {
+        await sendSmsOtp(user.phoneNumber, otp);
+      } else {
+        console.log('\n===== FORGOT PWD OTP (No Phone Number) =====');
+        console.log(`Email: ${user.email} | OTP: ${otp}`);
+        console.log('=====================================\n');
+      }
+    } else {
+      await sendPasswordResetEmail(normalizedEmail, otp);
+    }
+
+    res.status(200).json({ message: `If account exists, OTP sent via ${otpMethod ? otpMethod.toUpperCase() : 'EMAIL'}.` });
+  } catch (error) {
+    console.error('Forgot Password Error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

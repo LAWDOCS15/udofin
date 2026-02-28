@@ -80,12 +80,22 @@ const userSchema: Schema<IUser> = new Schema(
       lowercase: true,
       trim: true,
     },
-  phoneNumber: {
-  type: String,
-   unique: true,
-   required:false,
-   trim: true,
-},
+//   phoneNumber: {
+//   type: String,
+//    unique: true,
+//    sparse: true,
+//    required:false,
+//    trim: true,
+// },
+phoneNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      required: function (this: any) {
+        return this.role === 'BORROWER'; 
+      },
+      trim: true,
+    },
 
     password: {
       type: String,

@@ -33,6 +33,8 @@
 // };
 
 // export default mongoose.model<IOtp>('Otp', OtpSchema);
+
+
 import mongoose, {
   Schema,
   Model,
@@ -61,14 +63,18 @@ type OtpDocument = HydratedDocument<IOtp, IOtpMethods>;
 /*   Constants                   */
 /* ============================= */
 
-const OTP_EXPIRY_SECONDS = 300;
+const OTP_EXPIRY_SECONDS = 60; // ✅ changed to 60 seconds
 const SALT_ROUNDS = 12;
 
 /* ============================= */
 /*   Schema                      */
 /* ============================= */
 
-const otpSchema = new Schema<IOtp, Model<IOtp, {}, IOtpMethods>, IOtpMethods>(
+const otpSchema = new Schema<
+  IOtp,
+  Model<IOtp, {}, IOtpMethods>,
+  IOtpMethods
+>(
   {
     email: {
       type: String,
@@ -92,14 +98,14 @@ const otpSchema = new Schema<IOtp, Model<IOtp, {}, IOtpMethods>, IOtpMethods>(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: OTP_EXPIRY_SECONDS,
+      expires: OTP_EXPIRY_SECONDS, // ✅ Mongo TTL 60 sec
     },
   },
   { timestamps: false }
 );
 
 /* ============================= */
-/*   Pre Save Hook (NO next)     */
+/*   Pre Save Hook               */
 /* ============================= */
 
 otpSchema.pre('save', async function () {
@@ -126,9 +132,9 @@ otpSchema.method(
 /*   Model Export                */
 /* ============================= */
 
-const OtpModel = mongoose.model<IOtp, Model<IOtp, {}, IOtpMethods>>(
-  'Otp',
-  otpSchema
-);
+const OtpModel = mongoose.model<
+  IOtp,
+  Model<IOtp, {}, IOtpMethods>
+>('Otp', otpSchema);
 
 export default OtpModel;

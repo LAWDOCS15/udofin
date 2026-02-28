@@ -34,6 +34,7 @@
 
 // export default router;
 
+
 import { Router, Request, Response } from 'express';
 import {
   registerUser,
@@ -42,7 +43,8 @@ import {
   verifyLoginOtp,
   logoutUser,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  resendOtp
 } from '../controllers/auth.controller';
 
 import { protect } from '../middleware/auth.middleware';
@@ -60,6 +62,9 @@ router.post('/verify-email', verifyRegistration);
 router.post('/login', loginUser);
 
 router.post('/verify-login-otp', verifyLoginOtp);
+
+
+router.post('/resend-otp', resendOtp);
 
 router.post('/forgot-password', forgotPassword);
 
