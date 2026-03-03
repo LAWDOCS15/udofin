@@ -1,42 +1,3 @@
-// import mongoose, { Document, Schema } from 'mongoose';
-
-// export interface IApplication extends Document {
-//   borrowerId: mongoose.Types.ObjectId;
-//   nbfcId: mongoose.Types.ObjectId;
-//   aiChatData: any; 
-//   documents: {
-//     panCardUrl: string;
-//     aadhaarCardUrl: string;
-//     selfieUrl: string;
-//   };
-//   verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
-// }
-
-// const applicationSchema: Schema = new Schema(
-//   {
-//     borrowerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-//     nbfcId: { type: mongoose.Schema.Types.ObjectId, ref: 'NBFC', required: true },
-//     aiChatData: { type: Schema.Types.Mixed },
-//     documents: {
-//       panCardUrl: { type: String, required: true },
-//       aadhaarCardUrl: { type: String, required: true },
-//       selfieUrl: { type: String, required: true },
-//     },
-//     verificationStatus: { 
-//       type: String, 
-//       enum: ['PENDING', 'VERIFIED', 'REJECTED'], 
-//       default: 'PENDING' 
-//     },
-//   },
-//   { timestamps: true }
-// );
-
-// export default mongoose.model<IApplication>('Application', applicationSchema);
-
-
-
-
-
 import mongoose, {
   Document,
   Schema,
@@ -44,19 +5,18 @@ import mongoose, {
   Types,
 } from 'mongoose';
 
-/* =========================================
-   ENUM (Single Source of Truth)
-========================================= */
+  //  ENUM (Single Source of Truth)
+
+
 
 export enum VerificationStatus {
   PENDING = 'PENDING',
   VERIFIED = 'VERIFIED',
   REJECTED = 'REJECTED',
+  DISBURSED = 'DISBURSED', 
 }
 
-/* =========================================
-   AI Chat Data Type (No more any)
-========================================= */
+  //  AI Chat Data Type (No more any)
 
 export interface IAiChatData {
   score?: number;
@@ -65,9 +25,7 @@ export interface IAiChatData {
   raw?: Record<string, unknown>;
 }
 
-/* =========================================
-   Application Interface
-========================================= */
+  //  Application Interface
 
 export interface IApplication extends Document {
   borrowerId: Types.ObjectId;
@@ -79,13 +37,12 @@ export interface IApplication extends Document {
     selfieUrl: string;
   };
   verificationStatus: VerificationStatus;
+  rejectionReason?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
-/* =========================================
-   Schema
-========================================= */
+  //  Schema
 
 const applicationSchema = new Schema<IApplication>(
   {
@@ -125,7 +82,11 @@ const applicationSchema = new Schema<IApplication>(
         trim: true,
       },
     },
-
+    rejectionReason: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     verificationStatus: {
       type: String,
       enum: Object.values(VerificationStatus),
@@ -135,13 +96,11 @@ const applicationSchema = new Schema<IApplication>(
   },
   {
     timestamps: true,
-    strict: true, // 🔐 Prevent unwanted fields
+    strict: true, 
   }
 );
 
-/* =========================================
-   Compound Index (Performance Boost)
-========================================= */
+  //  Compound Index (Performance Boost)
 
 // Faster NBFC dashboard queries
 applicationSchema.index({ nbfcId: 1, createdAt: -1 });
@@ -149,9 +108,7 @@ applicationSchema.index({ nbfcId: 1, createdAt: -1 });
 // Faster borrower history queries
 applicationSchema.index({ borrowerId: 1, createdAt: -1 });
 
-/* =========================================
-   Model Export
-========================================= */
+  //  Model Export
 
 const Application: Model<IApplication> =
   mongoose.model<IApplication>('Application', applicationSchema);

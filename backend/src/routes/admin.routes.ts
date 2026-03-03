@@ -1,47 +1,19 @@
-// import express from 'express';
-// import { setupSuperAdmin, createNbfc, createNbfcAdmin } from '../controllers/admin.controller';
-// import { protect, authorizeRoles } from '../middleware/auth.middleware';
-
-// const router = express.Router();
-
-// // One time setup (No protection initially, secure it once created)
-// router.post('/setup-super-admin', setupSuperAdmin);
-
-// // Protected Super Admin Routes
-// router.post('/create-nbfc', protect, authorizeRoles('SUPER_ADMIN'), createNbfc);
-// router.post('/create-nbfc-admin', protect, authorizeRoles('SUPER_ADMIN'), createNbfcAdmin);
-
-// export default router; 
-
-
-
 import { Router } from 'express';
 import {
   setupSuperAdmin,
   createNbfc,
   createNbfcAdmin,
+  getSuperAdminDashboardData,
+  getAllNbfcs
 } from '../controllers/admin.controller';
 import {
   protect,
   authorizeRoles,
 } from '../middleware/auth.middleware';
 
-/* =========================================
-   Router Initialization
-========================================= */
-
 const router: Router = Router();
 
-/* =========================================
-   Public Routes (One-Time Setup)
-   ⚠️ Secure or remove after first use
-========================================= */
-
 router.post('/setup-super-admin', setupSuperAdmin);
-
-/* =========================================
-   Super Admin Protected Routes
-========================================= */
 
 router.post(
   '/create-nbfc',
@@ -57,8 +29,18 @@ router.post(
   createNbfcAdmin
 );
 
-/* =========================================
-   Export
-========================================= */
+router.get(
+  '/dashboard-data',
+  protect,
+  authorizeRoles('SUPER_ADMIN'),
+  getSuperAdminDashboardData
+);
+
+router.get(
+  '/nbfcs',
+  protect,
+  authorizeRoles('SUPER_ADMIN'),
+  getAllNbfcs
+);
 
 export default router;

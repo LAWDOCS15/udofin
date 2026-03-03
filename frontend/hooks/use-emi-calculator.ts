@@ -1,13 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-
-export interface EMIResult {
-  monthlyEMI: number
-  totalAmount: number
-  totalInterest: number
-  ratePerMonth: number
-}
+import type { EMIResult } from '@/types'
+export type { EMIResult }
 
 export function useEMICalculator(
   principal: number,

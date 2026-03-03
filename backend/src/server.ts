@@ -43,6 +43,7 @@
 
 
 
+import path from 'path';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 dotenv.config({ quiet: true });
@@ -51,31 +52,22 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import path from 'path';
 
 import { connectDB } from './config/db';
 import authRoutes from './routes/auth.routes';
 import applicationRoutes from './routes/application.routes';
 import adminRoutes from './routes/admin.routes';
 
-/* =====================================================
-   ENV CONFIG
-===================================================== */
-
+  //  ENV CONFIG
 
 if (!process.env.PORT) {
   console.warn('⚠️ PORT not defined, using default 5000');
 }
-
-/* =====================================================
-   APP INITIALIZATION
-===================================================== */
+  //  APP INITIALIZATION
 
 const app: Application = express();
 
-/* =====================================================
-   SECURITY MIDDLEWARE
-===================================================== */
+// SECURITY MIDDLEWARE
 
 // Secure HTTP headers
 app.use(helmet());
@@ -97,9 +89,7 @@ app.use(
   })
 );
 
-/* =====================================================
-   STANDARD MIDDLEWARE
-===================================================== */
+  //  STANDARD MIDDLEWARE
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -110,34 +100,26 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-/* =====================================================
-   STATIC FILES
-===================================================== */
+  //  STATIC FILES
 
 app.use(
   '/uploads',
   express.static(path.join(__dirname, '../uploads'))
 );
 
-/* =====================================================
-   ROUTES
-===================================================== */
+  //  ROUTES
 
 app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
 
-/* =====================================================
-   HEALTH CHECK
-===================================================== */
+  //  HEALTH CHECK
 
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'OK' });
 });
 
-/* =====================================================
-   404 HANDLER
-===================================================== */
+  //  404 HANDLER
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -145,9 +127,7 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-/* =====================================================
-   GLOBAL ERROR HANDLER
-===================================================== */
+  //  GLOBAL ERROR HANDLER
 
 app.use(
   (
@@ -164,9 +144,7 @@ app.use(
   }
 );
 
-/* =====================================================
-   SERVER START
-===================================================== */
+  //  SERVER START
 
 const PORT = process.env.PORT
   ? Number(process.env.PORT)

@@ -402,7 +402,7 @@ const setTokenCookie = (res: Response, userId: string): void => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', 
     maxAge: 30 * 60 * 1000,
     path: '/',
   });
@@ -831,6 +831,23 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     res.status(200).json({ message: `If account exists, OTP sent via ${otpMethod ? otpMethod.toUpperCase() : 'EMAIL'}.` });
   } catch (error) {
     console.error('Forgot Password Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+// 9. CHECK CURRENT USER SESSION (For Page Refresh)
+export const getMe = async (req: any, res: Response): Promise<void> => {
+  try {
+    // protect middleware already checks the cookie and attaches req.user
+    if (!req.user) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+    
+    res.status(200).json({
+      user: req.user
+    });
+  } catch (error) {
+    console.error('Get Me Error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
