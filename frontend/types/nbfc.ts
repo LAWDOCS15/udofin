@@ -1,4 +1,3 @@
-// ─── NBFC Admin Panel Types ─────────────────────────────────────────────────
 
 export type NBFCApplicationStatus = "pending" | "approved" | "rejected" | "disbursed" | "under-review"
 
@@ -28,17 +27,21 @@ export interface ApplicationTimelineEntry {
 }
 
 export interface NBFCCustomer {
-  id: string
-  name: string
-  phone: string
-  email: string
-  totalLoans: number
-  activeLoans: number
-  totalOutstanding: number
-  cibilScore: number
-  kycStatus: "verified" | "pending" | "rejected"
-  riskLevel: "low" | "medium" | "high"
-  joinedDate: string
+  id: string;
+  _id?: string; 
+  name: string;
+  phone: string;
+  email: string;
+  status: "active" | "overdue" | "closed"; 
+  loanId: string;
+  loanAmount: number; 
+  outstandingAmount: number;
+  emiAmount: number;
+  nextEmiDate: string;
+  cibilScore: number;
+  kycStatus: "verified" | "pending" | "rejected";
+  riskLevel: "low" | "medium" | "high";
+  joinedAt: string; 
 }
 
 export interface NBFCEMIRecord {
@@ -70,6 +73,7 @@ export interface NBFCDisbursement {
 }
 
 export interface NBFCDashboardStats {
+  totalApplications: number;
   totalLoans: number
   runningLoans: number
   completedLoans: number
@@ -91,4 +95,12 @@ export interface NBFCStaffMember {
   status: "active" | "inactive"
   joinedDate: string
   assignedApplications: number
+}
+
+
+export interface DataExportButtonProps {
+  onExportCSV?: () => void; 
+  onExportPDF?: () => void;
+  onExport?: (type: 'csv' | 'pdf') => void;
+  isLoading?: boolean;
 }

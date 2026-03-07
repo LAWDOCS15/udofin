@@ -5,7 +5,6 @@ import mongoose, {
   Types,
 } from 'mongoose';
 
-  //  ENUM (Single Source of Truth)
 
 
 
@@ -16,16 +15,15 @@ export enum VerificationStatus {
   DISBURSED = 'DISBURSED', 
 }
 
-  //  AI Chat Data Type (No more any)
 
 export interface IAiChatData {
   score?: number;
   riskCategory?: string;
+  requestedAmount?: number;
   summary?: string;
   raw?: Record<string, unknown>;
 }
 
-  //  Application Interface
 
 export interface IApplication extends Document {
   borrowerId: Types.ObjectId;
@@ -42,7 +40,6 @@ export interface IApplication extends Document {
   updatedAt: Date;
 }
 
-  //  Schema
 
 const applicationSchema = new Schema<IApplication>(
   {
@@ -100,15 +97,11 @@ const applicationSchema = new Schema<IApplication>(
   }
 );
 
-  //  Compound Index (Performance Boost)
 
-// Faster NBFC dashboard queries
 applicationSchema.index({ nbfcId: 1, createdAt: -1 });
 
-// Faster borrower history queries
 applicationSchema.index({ borrowerId: 1, createdAt: -1 });
 
-  //  Model Export
 
 const Application: Model<IApplication> =
   mongoose.model<IApplication>('Application', applicationSchema);
