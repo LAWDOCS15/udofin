@@ -1,393 +1,3 @@
-// "use client";
-
-// import { useState, useEffect } from "react";
-// import { Button } from "@/components/ui/button";
-// import { SearchFilterBar } from "@/components/shared/search-filter-bar";
-// import { LoanStatusBadge } from "@/components/shared/loan-status-badge";
-// import { ConfirmationModal } from "@/components/shared/confirmation-modal";
-// import { useToast } from "@/hooks/use-toast"; // ✅ Fixed toast import
-// import { adminAPI } from "@/config/api"; // ✅ Using centralized API
-// import { cn } from "@/lib/utils";
-// import {
-//   Plus,
-//   Building2,
-//   Eye,
-//   Settings,
-//   Trash2,
-//   X,
-//   Loader2,
-//   UserPlus,
-// } from "lucide-react";
-// // Updated Interface to match dynamic data
-// interface NBFCPartner {
-//   id: string;
-//   name: string;
-//   registrationNumber: string;
-//   status: "active" | "suspended" | string;
-//   totalLoans: number;
-//   totalDisbursed: number;
-//   region: string;
-//   adminEmail: string;
-//   onboardedAt: string;
-// }
-
-// const FILTERS = ["All", "Active", "Suspended"];
-
-// export function AdminNbfcManagement() {
-//   const { toast } = useToast(); // ✅ Fixed hook usage
-//   const [search, setSearch] = useState("");
-//   const [filter, setFilter] = useState("All");
-//   const [showModal, setShowModal] = useState(false);
-//   const [deleteNbfc, setDeleteNbfc] = useState<NBFCPartner | null>(null);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [isLoading, setIsLoading] = useState(true);
-
-//   // Real data state instead of DEMO_NBFCS
-//   const [nbfcs, setNbfcs] = useState<NBFCPartner[]>([]);
-
-//   const [form, setForm] = useState({
-//     nbfcName: "",
-//     registrationNumber: "",
-//     adminName: "",
-//     adminEmail: "",
-//     adminPassword: "",
-//   });
-
-//   // ✅ Fetch real NBFC data on load
-//   const fetchNbfcs = async () => {
-//     setIsLoading(true);
-//     try {
-//       const response = await adminAPI.getNbfcs();
-//       if (response.data?.nbfcs) {
-//         setNbfcs(response.data.nbfcs);
-//       }
-//     } catch (err: any) {
-//       toast({
-//         title: "Warning",
-//         description: "Failed to load NBFCs or using local demo data.",
-//         variant: "destructive",
-//       });
-//       // Fallback if backend route isn't ready yet
-//       setNbfcs([]);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchNbfcs();
-//   }, []);
-
-//   const filtered = nbfcs.filter((n) => {
-//     const matchSearch =
-//       n.name.toLowerCase().includes(search.toLowerCase()) ||
-//       n.registrationNumber.toLowerCase().includes(search.toLowerCase());
-//     if (filter === "Active") return matchSearch && n.status === "active";
-//     if (filter === "Suspended") return matchSearch && n.status === "suspended";
-//     return matchSearch;
-//   });
-
-//   const handleCreate = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setIsSubmitting(true);
-//     try {
-//       // ✅ Using centralized adminAPI
-//       const nbfcRes = await adminAPI.createNbfc({
-//         name: form.nbfcName,
-//         registrationNumber: form.registrationNumber,
-//       });
-
-//       await adminAPI.createNbfcAdmin({
-//         name: form.adminName,
-//         email: form.adminEmail,
-//         password: form.adminPassword,
-//         nbfcId: nbfcRes.data.nbfcId || nbfcRes.data.nbfc?._id,
-//       });
-
-//       toast({
-//         title: "Success",
-//         description: "NBFC Partner and Admin created successfully!",
-//       }); // ✅ Correct toast
-//       setShowModal(false);
-//       setForm({
-//         nbfcName: "",
-//         registrationNumber: "",
-//         adminName: "",
-//         adminEmail: "",
-//         adminPassword: "",
-//       });
-
-//       // Refresh list after creation
-//       fetchNbfcs();
-//     } catch (err: any) {
-//       toast({
-//         title: "Error",
-//         description:
-//           err.response?.data?.message ||
-//           err.message ||
-//           "Failed to create partner",
-//         variant: "destructive",
-//       }); // ✅ Correct toast
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   const inputClass =
-//     "h-10 w-full rounded-xl border border-border bg-secondary/30 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 transition-colors";
-//   const labelClass =
-//     "text-[11px] font-semibold text-muted-foreground mb-1.5 block";
-
-//   return (
-//     <div className="p-6 lg:p-8 space-y-6 relative">
-//       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-//         <div>
-//           <h1
-//             className="text-2xl font-bold text-foreground"
-//             style={{ fontFamily: "var(--font-heading)" }}
-//           >
-//             NBFC Partners
-//           </h1>
-//           <p className="text-xs text-muted-foreground mt-1">
-//             Manage registered NBFC partners
-//           </p>
-//         </div>
-//         <Button
-//           onClick={() => setShowModal(true)}
-//           className="h-9 gap-2 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-semibold shadow-lg shadow-accent/20"
-//         >
-//           <Plus className="h-3.5 w-3.5" /> Add NBFC Partner
-//         </Button>
-//       </div>
-
-//       <SearchFilterBar
-//         search={search}
-//         onSearchChange={setSearch}
-//         filters={FILTERS}
-//         activeFilter={filter}
-//         onFilterChange={setFilter}
-//       />
-
-//       {/* Loading State */}
-//       {isLoading ? (
-//         <div className="py-12 flex justify-center">
-//           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-//         </div>
-//       ) : (
-//         /* NBFC Cards */
-//         <div className="grid gap-4 sm:grid-cols-2">
-//           {filtered.length > 0 ? (
-//             filtered.map((nbfc) => (
-//               <div
-//                 key={nbfc.id}
-//                 className="rounded-2xl border border-border bg-card p-5 hover:border-accent/20 transition-all shadow-sm"
-//               >
-//                 <div className="flex items-center justify-between mb-3">
-//                   <div className="flex items-center gap-3">
-//                     <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-//                       <Building2 className="h-5 w-5 text-accent" />
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-foreground">
-//                         {nbfc.name}
-//                       </p>
-//                       <p className="text-[10px] text-muted-foreground font-mono">
-//                         {nbfc.registrationNumber}
-//                       </p>
-//                     </div>
-//                   </div>
-//                   <LoanStatusBadge status={nbfc.status} />
-//                 </div>
-//                 <div className="grid grid-cols-3 gap-3 mb-4">
-//                   <div className="text-center p-2 rounded-xl bg-secondary/30">
-//                     <p className="text-[10px] text-muted-foreground">Loans</p>
-//                     <p className="text-sm font-bold text-foreground">
-//                       {nbfc.totalLoans}
-//                     </p>
-//                   </div>
-//                   <div className="text-center p-2 rounded-xl bg-secondary/30">
-//                     <p className="text-[10px] text-muted-foreground">
-//                       Disbursed
-//                     </p>
-//                     <p className="text-sm font-bold text-foreground">
-//                       ₹{(nbfc.totalDisbursed / 100000).toFixed(1)}L
-//                     </p>
-//                   </div>
-//                   <div className="text-center p-2 rounded-xl bg-secondary/30">
-//                     <p className="text-[10px] text-muted-foreground">Region</p>
-//                     <p className="text-xs font-medium text-foreground">
-//                       {nbfc.region}
-//                     </p>
-//                   </div>
-//                 </div>
-//                 <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border pt-3">
-//                   <span>Admin: {nbfc.adminEmail}</span>
-//                   <div className="flex items-center gap-1">
-//                     <button className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
-//                       <Eye className="h-3.5 w-3.5" />
-//                     </button>
-//                     <button className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
-//                       <Settings className="h-3.5 w-3.5" />
-//                     </button>
-//                     <button
-//                       onClick={() => setDeleteNbfc(nbfc)}
-//                       className="h-7 w-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive"
-//                     >
-//                       <Trash2 className="h-3.5 w-3.5" />
-//                     </button>
-//                   </div>
-//                 </div>
-//               </div>
-//             ))
-//           ) : (
-//             <div className="col-span-full py-12 text-center text-sm text-muted-foreground">
-//               No NBFC partners found.
-//             </div>
-//           )}
-//         </div>
-//       )}
-
-//       {/* Add NBFC Modal */}
-//       {showModal && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-//           <div
-//             className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-//             onClick={() => setShowModal(false)}
-//           />
-//           <div className="relative w-full max-w-md rounded-3xl border border-border bg-card shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
-//             <div className="flex items-center justify-between mb-5">
-//               <h3
-//                 className="text-lg font-bold text-foreground"
-//                 style={{ fontFamily: "var(--font-heading)" }}
-//               >
-//                 Add NBFC Partner
-//               </h3>
-//               <button
-//                 onClick={() => setShowModal(false)}
-//                 className="text-muted-foreground hover:text-foreground bg-secondary p-1.5 rounded-full"
-//               >
-//                 <X className="h-4 w-4" />
-//               </button>
-//             </div>
-//             <form onSubmit={handleCreate} className="space-y-4">
-//               <div className="border-b border-border pb-4 space-y-3">
-//                 <p className="text-xs font-bold text-accent flex items-center gap-1.5">
-//                   <Building2 className="h-3.5 w-3.5" /> NBFC Details
-//                 </p>
-//                 <div>
-//                   <label className={labelClass}>Company Name *</label>
-//                   <input
-//                     required
-//                     value={form.nbfcName}
-//                     onChange={(e) =>
-//                       setForm({ ...form, nbfcName: e.target.value })
-//                     }
-//                     placeholder="NBFC company name"
-//                     className={inputClass}
-//                   />
-//                 </div>
-//                 <div>
-//                   <label className={labelClass}>Registration Number *</label>
-//                   <input
-//                     required
-//                     value={form.registrationNumber}
-//                     onChange={(e) =>
-//                       setForm({ ...form, registrationNumber: e.target.value })
-//                     }
-//                     placeholder="N-14.XXXXX"
-//                     className={inputClass}
-//                   />
-//                 </div>
-//               </div>
-//               <div className="space-y-3">
-//                 <p className="text-xs font-bold text-accent flex items-center gap-1.5">
-//                   <UserPlus className="h-3.5 w-3.5" /> Admin Account
-//                 </p>
-//                 <div>
-//                   <label className={labelClass}>Admin Name *</label>
-//                   <input
-//                     required
-//                     value={form.adminName}
-//                     onChange={(e) =>
-//                       setForm({ ...form, adminName: e.target.value })
-//                     }
-//                     placeholder="Full name"
-//                     className={inputClass}
-//                   />
-//                 </div>
-//                 <div>
-//                   <label className={labelClass}>Email *</label>
-//                   <input
-//                     required
-//                     type="email"
-//                     value={form.adminEmail}
-//                     onChange={(e) =>
-//                       setForm({ ...form, adminEmail: e.target.value })
-//                     }
-//                     placeholder="admin@nbfc.com"
-//                     className={inputClass}
-//                   />
-//                 </div>
-//                 <div>
-//                   <label className={labelClass}>Password *</label>
-//                   <input
-//                     required
-//                     type="password"
-//                     minLength={8}
-//                     value={form.adminPassword}
-//                     onChange={(e) =>
-//                       setForm({ ...form, adminPassword: e.target.value })
-//                     }
-//                     placeholder="Min 8 characters"
-//                     className={inputClass}
-//                   />
-//                 </div>
-//               </div>
-//               <div className="flex justify-end gap-3 pt-2">
-//                 <button
-//                   type="button"
-//                   onClick={() => setShowModal(false)}
-//                   className="h-9 px-4 rounded-xl text-xs text-muted-foreground hover:bg-secondary"
-//                 >
-//                   Cancel
-//                 </button>
-//                 <Button
-//                   type="submit"
-//                   disabled={isSubmitting}
-//                   className="h-9 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-semibold gap-2 min-w-[120px]"
-//                 >
-//                   {isSubmitting ? (
-//                     <>
-//                       <Loader2 className="h-3 w-3 animate-spin" /> Creating...
-//                     </>
-//                   ) : (
-//                     <>
-//                       <Plus className="h-3 w-3" /> Create Partner
-//                     </>
-//                   )}
-//                 </Button>
-//               </div>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-
-//       {deleteNbfc && (
-//         <ConfirmationModal
-//           open
-//           onClose={() => setDeleteNbfc(null)}
-//           onConfirm={() => setDeleteNbfc(null)}
-//           title="Remove NBFC Partner"
-//           description={`Remove ${deleteNbfc.name}? This will disable all their operations on the platform.`}
-//           confirmText="Remove"
-//           danger
-//         />
-//       )}
-//     </div>
-//   );
-// }
-
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -396,20 +6,10 @@ import { SearchFilterBar } from "@/components/shared/search-filter-bar";
 import { LoanStatusBadge } from "@/components/shared/loan-status-badge";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { useToast } from "@/components/shared/simple-toast"; 
-import { adminAPI } from "@/config/api"; 
+import { adminAPI } from "@/config/api/admin"; 
 import { cn } from "@/lib/utils";
-import {
-  Plus,
-  Building2,
-  Eye,
-  Settings,
-  Trash2,
-  X,
-  Loader2,
-  UserPlus,
-} from "lucide-react";
+import { Plus, Building2, Eye, Settings, Trash2, X, Loader2, UserPlus } from "lucide-react";
 
-// Updated Interface to match dynamic data
 interface NBFCPartner {
   id: string;
   name: string;
@@ -433,18 +33,12 @@ export function AdminNbfcManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Real data state instead of DEMO_NBFCS
   const [nbfcs, setNbfcs] = useState<NBFCPartner[]>([]);
 
   const [form, setForm] = useState({
-    nbfcName: "",
-    registrationNumber: "",
-    adminName: "",
-    adminEmail: "",
-    adminPassword: "",
+    nbfcName: "", registrationNumber: "", adminName: "", adminEmail: "", adminPassword: "",
   });
 
-  // Fetch real NBFC data on load
   const fetchNbfcs = async () => {
     setIsLoading(true);
     try {
@@ -453,22 +47,16 @@ export function AdminNbfcManagement() {
         setNbfcs(response.data.nbfcs);
       }
     } catch (err: any) {
-      // ✅ Using Custom Toast format
-      showToast("Failed to load NBFCs. Using local state.", "error");
-      setNbfcs([]);
+      showToast("Failed to load NBFCs.", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchNbfcs();
-  }, []);
+  useEffect(() => { fetchNbfcs(); }, []);
 
   const filtered = nbfcs.filter((n) => {
-    const matchSearch =
-      n.name.toLowerCase().includes(search.toLowerCase()) ||
-      n.registrationNumber.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = n.name.toLowerCase().includes(search.toLowerCase()) || n.registrationNumber.toLowerCase().includes(search.toLowerCase());
     if (filter === "Active") return matchSearch && n.status === "active";
     if (filter === "Suspended") return matchSearch && n.status === "suspended";
     return matchSearch;
@@ -478,232 +66,106 @@ export function AdminNbfcManagement() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const nbfcRes = await adminAPI.createNbfc({
-        name: form.nbfcName,
-        registrationNumber: form.registrationNumber,
-      });
-
-      await adminAPI.createNbfcAdmin({
-        name: form.adminName,
-        email: form.adminEmail,
-        password: form.adminPassword,
-        nbfcId: nbfcRes.data.nbfcId || nbfcRes.data.nbfc?._id,
-      });
-
-      // ✅ Using Custom Toast format
+      const nbfcRes = await adminAPI.createNbfc({ name: form.nbfcName, registrationNumber: form.registrationNumber });
+      await adminAPI.createNbfcAdmin({ name: form.adminName, email: form.adminEmail, password: form.adminPassword, nbfcId: nbfcRes.data.nbfcId || nbfcRes.data.nbfc?._id });
       showToast("NBFC Partner and Admin created successfully!", "success"); 
-      
       setShowModal(false);
-      setForm({
-        nbfcName: "",
-        registrationNumber: "",
-        adminName: "",
-        adminEmail: "",
-        adminPassword: "",
-      });
-
+      setForm({ nbfcName: "", registrationNumber: "", adminName: "", adminEmail: "", adminPassword: "" });
       fetchNbfcs();
     } catch (err: any) {
-      // ✅ Using Custom Toast format
-      const errorMsg = err.response?.data?.message || err.message || "Failed to create partner";
-      showToast(errorMsg, "error");
+      showToast(err.response?.data?.message || "Failed to create partner", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputClass =
-    "h-10 w-full rounded-xl border border-border bg-secondary/30 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 transition-colors";
-  const labelClass =
-    "text-[11px] font-semibold text-muted-foreground mb-1.5 block";
+  //  Delete  NBFC Function
+  const handleDelete = async () => {
+    if (!deleteNbfc) return;
+    try {
+      await adminAPI.deleteNbfc(deleteNbfc.id);
+      showToast("NBFC Deleted Successfully", "success");
+      setDeleteNbfc(null);
+      fetchNbfcs();
+    } catch (error) {
+      showToast("Failed to delete", "error");
+    }
+  }
+
+  const inputClass = "h-10 w-full rounded-xl border border-border bg-secondary/30 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 transition-colors";
+  const labelClass = "text-[11px] font-semibold text-muted-foreground mb-1.5 block";
 
   return (
     <div className="p-6 lg:p-8 space-y-6 relative">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1
-            className="text-2xl font-bold text-foreground"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            NBFC Partners
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Manage registered NBFC partners
-          </p>
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>NBFC Partners</h1>
+          <p className="text-xs text-muted-foreground mt-1">Manage registered NBFC partners</p>
         </div>
-        <Button
-          onClick={() => setShowModal(true)}
-          className="h-9 gap-2 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-semibold shadow-lg shadow-accent/20"
-        >
+        <Button onClick={() => setShowModal(true)} className="h-9 gap-2 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-semibold shadow-lg shadow-accent/20">
           <Plus className="h-3.5 w-3.5" /> Add NBFC Partner
         </Button>
       </div>
 
-      <SearchFilterBar
-        search={search}
-        onSearchChange={setSearch}
-        filters={FILTERS}
-        activeFilter={filter}
-        onFilterChange={setFilter}
-      />
+      <SearchFilterBar search={search} onSearchChange={setSearch} filters={FILTERS} activeFilter={filter} onFilterChange={setFilter} />
 
       {isLoading ? (
-        <div className="py-12 flex justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+        <div className="py-12 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {filtered.length > 0 ? (
             filtered.map((nbfc) => (
-              <div
-                key={nbfc.id}
-                className="rounded-2xl border border-border bg-card p-5 hover:border-accent/20 transition-all shadow-sm"
-              >
+              <div key={nbfc.id} className="rounded-2xl border border-border bg-card p-5 hover:border-accent/20 transition-all shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Building2 className="h-5 w-5 text-accent" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">
-                        {nbfc.name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground font-mono">
-                        {nbfc.registrationNumber}
-                      </p>
-                    </div>
+                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><Building2 className="h-5 w-5 text-accent" /></div>
+                    <div><p className="text-sm font-bold text-foreground">{nbfc.name}</p><p className="text-[10px] text-muted-foreground font-mono">{nbfc.registrationNumber}</p></div>
                   </div>
                   <LoanStatusBadge status={nbfc.status} />
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center p-2 rounded-xl bg-secondary/30">
-                    <p className="text-[10px] text-muted-foreground">Loans</p>
-                    <p className="text-sm font-bold text-foreground">
-                      {nbfc.totalLoans}
-                    </p>
-                  </div>
-                  <div className="text-center p-2 rounded-xl bg-secondary/30">
-                    <p className="text-[10px] text-muted-foreground">
-                      Disbursed
-                    </p>
-                    <p className="text-sm font-bold text-foreground">
-                      ₹{(nbfc.totalDisbursed / 100000).toFixed(1)}L
-                    </p>
-                  </div>
-                  <div className="text-center p-2 rounded-xl bg-secondary/30">
-                    <p className="text-[10px] text-muted-foreground">Region</p>
-                    <p className="text-xs font-medium text-foreground">
-                      {nbfc.region}
-                    </p>
-                  </div>
+                  <div className="text-center p-2 rounded-xl bg-secondary/30"><p className="text-[10px] text-muted-foreground">Loans</p><p className="text-sm font-bold text-foreground">{nbfc.totalLoans}</p></div>
+                  <div className="text-center p-2 rounded-xl bg-secondary/30"><p className="text-[10px] text-muted-foreground">Disbursed</p><p className="text-sm font-bold text-foreground">₹{(nbfc.totalDisbursed / 100000).toFixed(1)}L</p></div>
+                  <div className="text-center p-2 rounded-xl bg-secondary/30"><p className="text-[10px] text-muted-foreground">Region</p><p className="text-xs font-medium text-foreground">{nbfc.region}</p></div>
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border pt-3">
                   <span>Admin: {nbfc.adminEmail}</span>
                   <div className="flex items-center gap-1">
-                    <button className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
-                    <button className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
-                      <Settings className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteNbfc(nbfc)}
-                      className="h-7 w-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    {/*  View/Settings icons now have toast instead of doing nothing */}
+                    <button onClick={() => showToast("Detailed view coming soon!", "success")} className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground"><Eye className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => showToast("Settings panel coming soon!", "success")} className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground"><Settings className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setDeleteNbfc(nbfc)} className="h-7 w-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full py-12 text-center text-sm text-muted-foreground">
-              No NBFC partners found.
-            </div>
+            <div className="col-span-full py-12 text-center text-sm text-muted-foreground">No NBFC partners found.</div>
           )}
         </div>
       )}
 
+      {/* Modal code for Add NBFC remains exactly same... */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={() => setShowModal(false)}
-          />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowModal(false)} />
           <div className="relative w-full max-w-md rounded-3xl border border-border bg-card shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-foreground">Add NBFC Partner</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-muted-foreground hover:text-foreground bg-secondary p-1.5 rounded-full"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground bg-secondary p-1.5 rounded-full"><X className="h-4 w-4" /></button>
             </div>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="border-b border-border pb-4 space-y-3">
-                <div>
-                  <label className={labelClass}>Company Name *</label>
-                  <input
-                    required
-                    value={form.nbfcName}
-                    onChange={(e) => setForm({ ...form, nbfcName: e.target.value })}
-                    placeholder="NBFC company name"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Registration Number *</label>
-                  <input
-                    required
-                    value={form.registrationNumber}
-                    onChange={(e) => setForm({ ...form, registrationNumber: e.target.value })}
-                    placeholder="N-14.XXXXX"
-                    className={inputClass}
-                  />
-                </div>
+                <div><label className={labelClass}>Company Name *</label><input required value={form.nbfcName} onChange={(e) => setForm({ ...form, nbfcName: e.target.value })} className={inputClass} /></div>
+                <div><label className={labelClass}>Registration Number *</label><input required value={form.registrationNumber} onChange={(e) => setForm({ ...form, registrationNumber: e.target.value })} className={inputClass} /></div>
               </div>
               <div className="space-y-3">
-                <div>
-                  <label className={labelClass}>Admin Name *</label>
-                  <input
-                    required
-                    value={form.adminName}
-                    onChange={(e) => setForm({ ...form, adminName: e.target.value })}
-                    placeholder="Full name"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Email *</label>
-                  <input
-                    required
-                    type="email"
-                    value={form.adminEmail}
-                    onChange={(e) => setForm({ ...form, adminEmail: e.target.value })}
-                    placeholder="admin@nbfc.com"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Password *</label>
-                  <input
-                    required
-                    type="password"
-                    minLength={8}
-                    value={form.adminPassword}
-                    onChange={(e) => setForm({ ...form, adminPassword: e.target.value })}
-                    placeholder="Min 8 characters"
-                    className={inputClass}
-                  />
-                </div>
+                <div><label className={labelClass}>Admin Name *</label><input required value={form.adminName} onChange={(e) => setForm({ ...form, adminName: e.target.value })} className={inputClass} /></div>
+                <div><label className={labelClass}>Email *</label><input required type="email" value={form.adminEmail} onChange={(e) => setForm({ ...form, adminEmail: e.target.value })} className={inputClass} /></div>
+                <div><label className={labelClass}>Password *</label><input required type="password" minLength={8} value={form.adminPassword} onChange={(e) => setForm({ ...form, adminPassword: e.target.value })} className={inputClass} /></div>
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="h-9 rounded-xl bg-accent text-accent-foreground min-w-[120px]"
-                >
+                <Button type="submit" disabled={isSubmitting} className="h-9 rounded-xl bg-accent text-accent-foreground min-w-[120px]">
                   {isSubmitting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Create Partner"}
                 </Button>
               </div>
@@ -712,16 +174,9 @@ export function AdminNbfcManagement() {
         </div>
       )}
 
+      {/*  FIX: Final confirmation uses new handleDelete function */}
       {deleteNbfc && (
-        <ConfirmationModal
-          open
-          onClose={() => setDeleteNbfc(null)}
-          onConfirm={() => setDeleteNbfc(null)}
-          title="Remove NBFC Partner"
-          description={`Remove ${deleteNbfc.name}?`}
-          confirmText="Remove"
-          danger
-        />
+        <ConfirmationModal open onClose={() => setDeleteNbfc(null)} onConfirm={handleDelete} title="Remove NBFC Partner" description={`Are you sure you want to delete ${deleteNbfc.name}? This action cannot be undone.`} confirmText="Remove" danger />
       )}
     </div>
   );

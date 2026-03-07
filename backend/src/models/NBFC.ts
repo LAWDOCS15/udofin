@@ -5,9 +5,7 @@ import mongoose, {
   Model,
 } from 'mongoose';
 
-/* =========================================
-   Interface
-========================================= */
+  //  Interface
 
 export interface INBFC extends Document {
   name: string;
@@ -17,9 +15,7 @@ export interface INBFC extends Document {
   updatedAt: Date;
 }
 
-/* =========================================
-   Schema
-========================================= */
+  //  Schema
 
 const nbfcSchema = new Schema<INBFC>(
   {
@@ -51,9 +47,7 @@ const nbfcSchema = new Schema<INBFC>(
   }
 );
 
-/* =========================================
-   INDEXES (Defined ONLY Here)
-========================================= */
+  //  INDEXES (Defined ONLY Here)
 
 // Unique registration number (case-safe because uppercase:true)
 nbfcSchema.index({ registrationNumber: 1 }, { unique: true });
@@ -64,9 +58,7 @@ nbfcSchema.index({ isActive: 1 });
 // Fast admin queries (active + recent)
 nbfcSchema.index({ isActive: 1, createdAt: -1 });
 
-/* =========================================
-   Model Export
-========================================= */
+  //  Model Export
 
 const NBFC: Model<INBFC> =
   mongoose.model<INBFC>('NBFC', nbfcSchema);

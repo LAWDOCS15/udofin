@@ -67,7 +67,7 @@ phoneNumber: {
       default: null,
     },
 
-    // 🔐 Brute-force protection
+    //  Brute-force protection
     loginAttempts: {
       type: Number,
       default: 0,
@@ -80,7 +80,7 @@ phoneNumber: {
   { timestamps: true }
 );
 
-// 🔐 Hash password
+//  Hash password
 userSchema.pre<IUser>('save', async function () {
   if (!this.isModified('password') || !this.password) return;
 
@@ -88,7 +88,7 @@ userSchema.pre<IUser>('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// 🔐 Compare password
+//  Compare password
 userSchema.methods.comparePassword = async function (
   enteredPassword: string
 ): Promise<boolean> {

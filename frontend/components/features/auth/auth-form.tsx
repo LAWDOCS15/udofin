@@ -14,7 +14,7 @@ import { authAPI } from "@/config/api"
 export function AuthForm() {
   const router = useRouter()
   const { setIsAuthenticated, setUserRole, completeStep, updateProfile } = useOnboarding()
-  const { showToast } = useToast() // ✅ Fixed hook
+  const { showToast } = useToast() 
 
   const [mode, setMode] = useState<AuthMode>("login")
   const [showPassword, setShowPassword] = useState(false)
@@ -72,9 +72,9 @@ export function AuthForm() {
         await authAPI.forgotPassword({ email: tempData.email, otpMethod });
       }
       setCountdown(60) 
-      showToast(`OTP resent to your ${otpMethod.toUpperCase()}!`, "success") // ✅ Fixed Toast
+      showToast(`OTP resent to your ${otpMethod.toUpperCase()}!`, "success") 
     } catch (err: any) {
-      showToast(err.response?.data?.message || "Failed to resend OTP", "error") // ✅ Fixed Toast
+      showToast(err.response?.data?.message || "Failed to resend OTP", "error") 
     } finally {
       setResendLoading(false)
     }
@@ -100,12 +100,12 @@ export function AuthForm() {
             setTempData({ ...tempData, email })
             setSubStep("verify-login-otp")
             setCountdown(60) 
-            showToast(`OTP sent to your ${otpMethod.toUpperCase()}!`, "success") // ✅ Fixed Toast
+            showToast(`OTP sent to your ${otpMethod.toUpperCase()}!`, "success") 
             setLoading(false)
             return;
           }
 
-          showToast("Login successful!", "success") // ✅ Fixed Toast
+          showToast("Login successful!", "success")
           const rawRole = data.user?.role || "BORROWER";
           const formattedRole = rawRole.toUpperCase().replace(" ", "_");
           updateProfile({ fullName: data.user?.name || "" }) 
@@ -128,7 +128,7 @@ export function AuthForm() {
           setTempData({ ...tempData, email, name, phoneNumber })
           setSubStep("verify-otp")
           setCountdown(60) 
-          showToast(`OTP sent to your ${otpMethod.toUpperCase()}!`, "success") // ✅ Fixed Toast
+          showToast(`OTP sent to your ${otpMethod.toUpperCase()}!`, "success") 
         }
       } 
       else if (subStep === "verify-login-otp") {
@@ -136,7 +136,7 @@ export function AuthForm() {
         const response = await authAPI.verifyLoginOtp({ email: tempData.email, otp })
         const data = response.data
 
-        showToast("Login successful!", "success") // ✅ Fixed Toast
+        showToast("Login successful!", "success") 
         setIsAuthenticated(true)
         
         const rawRole = data.user?.role || "BORROWER";
@@ -153,7 +153,7 @@ export function AuthForm() {
       else if (subStep === "verify-otp") {
         const otp = formData.get("otp") as string
         await authAPI.verifyEmail({ email: tempData.email, otp })
-        showToast("Account verified and logged in!", "success") // ✅ Added Toast
+        showToast("Account verified and logged in!", "success") 
         setIsAuthenticated(true)
         setUserRole("user")
         updateProfile({ fullName: tempData.name })
@@ -166,7 +166,7 @@ export function AuthForm() {
         setTempData({ ...tempData, email })
         setSubStep("verify-reset-otp")
         setCountdown(60) 
-        showToast("Password reset OTP sent.", "success") // ✅ Fixed Toast
+        showToast("Password reset OTP sent.", "success") 
       }
       else if (subStep === "verify-reset-otp") {
         const otp = formData.get("otp") as string
@@ -179,11 +179,11 @@ export function AuthForm() {
         await authAPI.resetPassword({ email: tempData.email, otp: tempData.otp, newPassword, confirmPassword })
         setSubStep("none")
         setMode("login")
-        showToast("Password reset successful. Please log in.", "success") // ✅ Fixed Toast
+        showToast("Password reset successful. Please log in.", "success") 
       }
     } catch (err: any) {
       const message = err.response?.data?.message || err.message || "Something went wrong"
-      showToast(message, "error") // ✅ Fixed Toast
+      showToast(message, "error")
     } finally {
       setLoading(false)
     }

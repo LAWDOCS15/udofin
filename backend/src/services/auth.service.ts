@@ -208,7 +208,7 @@ export const resendOtpService = async (data: any) => {
     await sendEmailOtp(normalizedEmail, otp);
   }
 
-  // ✅ FIX: Safely handling otpMethod for TypeScript
+  //  Safely handling otpMethod for TypeScript
   const methodStr = otpMethod ? String(otpMethod).toUpperCase() : 'EMAIL';
   return { message: `New OTP sent successfully via ${methodStr}.` };
 };

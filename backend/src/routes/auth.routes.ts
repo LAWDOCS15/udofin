@@ -15,9 +15,7 @@ import { protect } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 
-/* =========================
-   🔓 Public Auth Routes
-========================= */
+    // Public Auth Routes
 
 router.post('/register', registerUser);
 
@@ -35,9 +33,7 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
 
-/* =========================
-   🔐 Protected Routes
-========================= */
+    // Protected Routes
 
 // Logout should be protected
 router.get('/me', protect, getMe);

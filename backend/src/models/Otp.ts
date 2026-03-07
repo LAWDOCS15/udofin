@@ -5,9 +5,7 @@ import mongoose, {
 } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-/* ============================= */
 /*   Types                       */
-/* ============================= */
 
 export interface IOtp {
   email: string;
@@ -22,16 +20,12 @@ export interface IOtpMethods {
 
 type OtpDocument = HydratedDocument<IOtp, IOtpMethods>;
 
-/* ============================= */
 /*   Constants                   */
-/* ============================= */
 
-const OTP_EXPIRY_SECONDS = 60; // ✅ changed to 60 seconds
+const OTP_EXPIRY_SECONDS = 300; //  changed to 300 seconds (5 minutes)
 const SALT_ROUNDS = 12;
 
-/* ============================= */
 /*   Schema                      */
-/* ============================= */
 
 const otpSchema = new Schema<
   IOtp,
@@ -61,15 +55,13 @@ const otpSchema = new Schema<
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: OTP_EXPIRY_SECONDS, // ✅ Mongo TTL 60 sec
+      expires: OTP_EXPIRY_SECONDS, 
     },
   },
   { timestamps: false }
 );
 
-/* ============================= */
 /*   Pre Save Hook               */
-/* ============================= */
 
 otpSchema.pre('save', async function () {
   const doc = this as OtpDocument;
@@ -80,9 +72,7 @@ otpSchema.pre('save', async function () {
   doc.otp = await bcrypt.hash(doc.otp, salt);
 });
 
-/* ============================= */
 /*   Instance Method             */
-/* ============================= */
 
 otpSchema.method(
   'compareOtp',
@@ -91,9 +81,7 @@ otpSchema.method(
   }
 );
 
-/* ============================= */
 /*   Model Export                */
-/* ============================= */
 
 const OtpModel = mongoose.model<
   IOtp,

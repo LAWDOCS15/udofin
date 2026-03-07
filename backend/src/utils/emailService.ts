@@ -1,8 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer';
 
-/* =====================================================
-   ENV VALIDATION
-===================================================== */
+  //  ENV VALIDATION
 
 const {
   EMAIL_HOST,
@@ -17,9 +15,7 @@ if (!EMAIL_USER || !EMAIL_PASS) {
   throw new Error('Email credentials not configured properly.');
 }
 
-/* =====================================================
-   TRANSPORTER (Singleton)
-===================================================== */
+  //  TRANSPORTER (Singleton)
 
 const transporter: Transporter = nodemailer.createTransport({
   host: EMAIL_HOST || 'smtp.gmail.com',
@@ -31,9 +27,7 @@ const transporter: Transporter = nodemailer.createTransport({
   },
 });
 
-/* =====================================================
-   BASE SEND FUNCTION
-===================================================== */
+  //  BASE SEND FUNCTION
 
 interface SendMailOptions {
   to: string;
@@ -61,9 +55,7 @@ const sendMail = async ({ to, subject, html }: SendMailOptions): Promise<void> =
   }
 };
 
-/* =====================================================
-   EMAIL TEMPLATES
-===================================================== */
+  //  EMAIL TEMPLATES
 
 const buildOtpTemplate = (
   title: string,
@@ -92,9 +84,7 @@ const buildSimpleTemplate = (
 </div>
 `;
 
-/* =====================================================
-   EXPORTED EMAIL FUNCTIONS
-===================================================== */
+  //  EXPORTED EMAIL FUNCTIONS
 
 // Registration OTP
 export const sendEmailOtp = async (email: string, otp: string): Promise<void> => {

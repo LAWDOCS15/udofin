@@ -11,9 +11,8 @@ if (!fs.existsSync(UPLOAD_ROOT)) {
   fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
 }
 
-// =============================
-// 📁 Storage Configuration
-// =============================
+// Storage Configuration
+
 const storage = multer.diskStorage({
 
   destination: (
@@ -54,9 +53,7 @@ const storage = multer.diskStorage({
 });
 
 
-// =============================
-// 🔎 File Filter (Strict)
-// =============================
+//  File Filter (Strict)
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
@@ -87,9 +84,7 @@ const fileFilter = (
 };
 
 
-// =============================
-// 🚀 Export Upload Middleware
-// =============================
+//  Export Upload Middleware
 export const uploadDocuments = multer({
   storage,
   fileFilter,

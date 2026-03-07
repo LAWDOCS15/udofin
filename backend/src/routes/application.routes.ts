@@ -13,15 +13,11 @@ import {
 import { uploadDocuments } from '../middleware/upload.middleware';
 
 
-/* =========================================
-   Router Initialization
-========================================= */
+  //  Router Initialization
 
 const router: Router = Router();
 
-/* =========================================
-   Borrower Routes
-========================================= */
+  //  Borrower Routes
 
 router.post(
   '/submit',
@@ -35,9 +31,7 @@ router.post(
   submitApplication
 );
 
-/* =========================================
-   NBFC Admin Routes
-========================================= */
+  //  NBFC Admin Routes
 
 router.get(
   '/leads',
@@ -59,14 +53,10 @@ router.get(
   authorizeRoles('BORROWER'),
   getMyApplications
 );
-/* =========================================
-   Public Routes
-========================================= */
+  //  Public Routes
 
 router.get('/nbfcs', getActiveNbfcs);
 
-/* =========================================
-   Export
-========================================= */
+  //  Export
 
 export default router;

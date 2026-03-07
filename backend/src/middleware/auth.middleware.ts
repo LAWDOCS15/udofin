@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 
-// 🔐 Strong JWT Payload
+//  Strong JWT Payload
 
 interface TokenPayload extends JwtPayload {
   id: string;

@@ -1,8 +1,6 @@
 import twilio, { Twilio } from 'twilio';
 
-/* =====================================================
-   ENV VARIABLES
-===================================================== */
+  //  ENV VARIABLES
 
 const {
   TWILIO_ACCOUNT_SID,
@@ -11,9 +9,7 @@ const {
   NODE_ENV,
 } = process.env;
 
-/* =====================================================
-   TWILIO CLIENT (Singleton)
-===================================================== */
+  //  TWILIO CLIENT (Singleton)
 
 let twilioClient: Twilio | null = null;
 
@@ -21,9 +17,7 @@ if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
   twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 }
 
-/* =====================================================
-   UTILITIES
-===================================================== */
+  //  UTILITIES
 
 // Normalize phone number (Default India +91)
 const formatPhoneNumber = (phoneNumber: string): string => {
@@ -42,9 +36,7 @@ interface SendSmsOptions {
   message: string;
 }
 
-/* =====================================================
-   CORE SMS FUNCTION
-===================================================== */
+  //  CORE SMS FUNCTION
 
 const sendSms = async ({ to, message }: SendSmsOptions): Promise<void> => {
   try {
@@ -74,9 +66,7 @@ const sendSms = async ({ to, message }: SendSmsOptions): Promise<void> => {
   }
 };
 
-/* =====================================================
-   EXPORTED OTP FUNCTION
-===================================================== */
+  //  EXPORTED OTP FUNCTION
 
 export const sendSmsOtp = async (
   phoneNumber: string,

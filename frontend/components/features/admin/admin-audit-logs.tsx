@@ -1,108 +1,129 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { SearchFilterBar } from "@/components/shared/search-filter-bar"
 import { cn } from "@/lib/utils"
-import { Shield, User, Settings, FileText, Clock, ChevronLeft, ChevronRight, AlertTriangle, LogIn, LogOut, Edit } from "lucide-react"
-import type { AuditLogEntry } from "@/types"
+import { adminAPI } from "@/config/api/admin"
+import { Shield, User, Settings, FileText, Clock, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from "lucide-react"
 
-const DEMO_LOGS: AuditLogEntry[] = [
-  { id: "AL001", userId: "U001", userName: "Admin (Priyanshu)", action: "Approved application APP003", resource: "application", timestamp: "2026-02-16 14:32:01", ipAddress: "192.168.1.100", severity: "info" },
-  { id: "AL002", userId: "U002", userName: "Admin (Priyanshu)", action: "Blocked user Rajesh Kumar", resource: "user", timestamp: "2026-02-16 13:15:44", ipAddress: "192.168.1.100", severity: "warning" },
-  { id: "AL003", userId: "U001", userName: "Admin (Priyanshu)", action: "Created NBFC partner: QuickLend Finance", resource: "nbfc", timestamp: "2026-02-16 11:08:22", ipAddress: "192.168.1.100", severity: "info" },
-  { id: "AL004", userId: "U004", userName: "NBFC Admin (Anjali)", action: "Disbursed ₹8L to Virendra Singh", resource: "loan", timestamp: "2026-02-16 10:45:30", ipAddress: "10.0.0.15", severity: "info" },
-  { id: "AL005", userId: "U001", userName: "Admin (Priyanshu)", action: "Updated platform settings", resource: "settings", timestamp: "2026-02-15 18:20:11", ipAddress: "192.168.1.100", severity: "info" },
-  { id: "AL006", userId: "system", userName: "System", action: "Failed login attempt (3 times) for admin@udofin.in", resource: "auth", timestamp: "2026-02-15 16:05:33", ipAddress: "45.33.12.89", severity: "critical" },
-  { id: "AL007", userId: "U001", userName: "Admin (Priyanshu)", action: "Exported user data CSV", resource: "export", timestamp: "2026-02-15 14:50:18", ipAddress: "192.168.1.100", severity: "warning" },
-  { id: "AL008", userId: "U004", userName: "NBFC Admin (Anjali)", action: "Rejected application APP005", resource: "application", timestamp: "2026-02-15 12:30:45", ipAddress: "10.0.0.15", severity: "info" },
-]
+const getReadableAction = (rawAction: string, moduleName: string) => {
+  const action = rawAction?.toLowerCase() || "";
+  
+  if (action.includes("settings")) return "Updated Platform Settings";
+  if (action.includes("delete") && action.includes("nbfcs")) return "Deleted an NBFC Partner";
+  if (action.includes("create-nbfc-admin")) return "Created NBFC Admin Account";
+  if (action.includes("create-nbfc")) return "Onboarded New NBFC Partner";
+  if (action.includes("support/reply")) return "Replied to a Support Ticket";
+  if (action.includes("status") && action.includes("tickets")) return "Resolved/Closed a Support Ticket";
 
-const FILTERS = ["All", "Info", "Warning", "Critical"]
+  if (moduleName) return moduleName.replace(/_/g, ' '); 
+  
+  return rawAction; 
+};
 
-const getActionIcon = (resource: string) => {
-  const map: Record<string, React.ReactNode> = {
-    application: <FileText className="h-3.5 w-3.5" />,
-    user: <User className="h-3.5 w-3.5" />,
-    nbfc: <Settings className="h-3.5 w-3.5" />,
-    loan: <Edit className="h-3.5 w-3.5" />,
-    settings: <Settings className="h-3.5 w-3.5" />,
-    auth: <LogIn className="h-3.5 w-3.5" />,
-    export: <LogOut className="h-3.5 w-3.5" />,
-  }
-  return map[resource] || <Shield className="h-3.5 w-3.5" />
-}
+// Helper for severity icons
+const getActionIcon = (severity: string) => {
+  if (severity === "critical") return <AlertTriangle className="h-3.5 w-3.5" />;
+  if (severity === "warning") return <Shield className="h-3.5 w-3.5" />;
+  return <FileText className="h-3.5 w-3.5" />;
+};
+
 
 export function AdminAuditLogs() {
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState("All")
   const [page, setPage] = useState(1)
+  const [logs, setLogs] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filtered = DEMO_LOGS.filter((log) => {
-    const matchSearch = log.action.toLowerCase().includes(search.toLowerCase()) || log.userName.toLowerCase().includes(search.toLowerCase())
-    if (filter === "Info") return matchSearch && log.severity === "info"
-    if (filter === "Warning") return matchSearch && log.severity === "warning"
-    if (filter === "Critical") return matchSearch && log.severity === "critical"
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const res = await adminAPI.getAuditLogs()
+        const fetchedLogs = res.data?.logs || res.data || [];
+        setLogs(Array.isArray(fetchedLogs) ? fetchedLogs : []);
+      } catch (error) {
+        console.error("Failed to load logs", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchLogs()
+  }, [])
+
+  const filtered = logs.filter((log) => {
+    const actionText = log.action?.toLowerCase() || ""
+    const adminName = log.adminId?.name?.toLowerCase() || ""
+    const matchSearch = actionText.includes(search.toLowerCase()) || adminName.includes(search.toLowerCase())
+    
+    // For now backend doesn't send severity, mapping all to info unless it's a DELETE/REJECT action
+    const severity = actionText.includes('reject') || actionText.includes('delete') ? 'warning' : 'info'
+    if (filter === "Info") return matchSearch && severity === "info"
+    if (filter === "Warning") return matchSearch && severity === "warning"
     return matchSearch
   })
+
+  if (isLoading) return <div className="py-20 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>Audit Logs</h1>
-        <p className="text-xs text-muted-foreground mt-1">Security and activity trail</p>
+        <p className="text-xs text-muted-foreground mt-1">Security and activity trail (Live Data)</p>
       </div>
 
-      <SearchFilterBar search={search} onSearchChange={setSearch} filters={FILTERS} activeFilter={filter} onFilterChange={setFilter} />
+      <SearchFilterBar search={search} onSearchChange={setSearch} filters={["All", "Info", "Warning"]} activeFilter={filter} onFilterChange={setFilter} />
 
-      {/* Logs */}
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border bg-secondary/30">
-                {["Severity", "User", "Action", "Timestamp", "IP Address"].map((h) => (
+                {["Role", "Admin", "Action", "Timestamp", "IP Address"].map((h) => (
                   <th key={h} className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.map((log) => (
-                <tr key={log.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+              {filtered.map((log) => {
+                 const severity = log.action?.toLowerCase().includes('delete') ? 'warning' : 'info';
+                 return (
+                <tr key={log._id} className="border-b border-border hover:bg-secondary/20 transition-colors">
                   <td className="px-4 py-3">
-                    <div className={cn(
-                      "h-7 w-7 rounded-lg flex items-center justify-center",
-                      log.severity === "critical" ? "bg-red-500/10 text-red-500" :
-                      log.severity === "warning" ? "bg-yellow-500/10 text-yellow-500" :
-                      "bg-blue-500/10 text-blue-500"
+                    <span className={cn(
+                      "text-[10px] font-semibold px-2 py-1 rounded-full",
+                      log.adminRole === "SUPER_ADMIN" ? "bg-purple-500/10 text-purple-600" : "bg-blue-500/10 text-blue-500"
                     )}>
-                      {log.severity === "critical" ? <AlertTriangle className="h-3.5 w-3.5" /> : getActionIcon(log.resource)}
+                      {log.adminRole ? log.adminRole.replace('_', ' ') : 'SYSTEM'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-xs font-semibold text-foreground">{log.adminId?.name || "System"}</p>
+                    <p className="text-[10px] text-muted-foreground">{log.adminId?.email || "-"}</p>
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium text-foreground">
+                    <div className="flex items-center gap-2">
+                       <div className={cn(
+                        "h-6 w-6 rounded flex items-center justify-center",
+                        severity === "warning" ? "bg-red-500/10 text-red-500" : "bg-accent/10 text-accent"
+                      )}>
+                        {getActionIcon(severity)}
+                      </div>
+                      {getReadableAction(log.action, log.module)}
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <p className="text-xs font-semibold text-foreground">{log.userName}</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">{log.userId}</p>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-foreground max-w-xs">{log.action}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                      <Clock className="h-3 w-3" /> {log.timestamp}
+                      <Clock className="h-3 w-3" /> {new Date(log.createdAt).toLocaleString()}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[10px] font-mono text-muted-foreground">{log.ipAddress}</td>
+                  <td className="px-4 py-3 text-[10px] font-mono text-muted-foreground">{log.ip || "Unknown"}</td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
         {filtered.length === 0 && <div className="py-12 text-center text-sm text-muted-foreground">No logs found</div>}
-        <div className="flex items-center justify-between border-t border-border px-4 py-3">
-          <p className="text-[10px] text-muted-foreground">Showing {filtered.length} entries</p>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setPage(Math.max(1, page - 1))} className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground"><ChevronLeft className="h-3.5 w-3.5" /></button>
-            <span className="h-7 w-7 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-xs font-medium">{page}</span>
-            <button onClick={() => setPage(page + 1)} className="h-7 w-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground"><ChevronRight className="h-3.5 w-3.5" /></button>
-          </div>
-        </div>
       </div>
     </div>
   )

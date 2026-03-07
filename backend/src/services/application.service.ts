@@ -38,9 +38,12 @@ export const submitApplicationService = async (
     nbfcId: nbfcObjectId,
     aiChatData: parsedChatData,
     documents: {
-      panCardUrl: files.panCard[0].path,
-      aadhaarCardUrl: files.aadhaarCard[0].path,
-      selfieUrl: files.selfie[0].path,
+      // panCardUrl: files.panCard[0].path,
+      // aadhaarCardUrl: files.aadhaarCard[0].path,
+      // selfieUrl: files.selfie[0].path,
+      panCardUrl: files.panCard[0].path.replace(/\\/g, "/"),
+      aadhaarCardUrl: files.aadhaarCard[0].path.replace(/\\/g, "/"),
+      selfieUrl: files.selfie[0].path.replace(/\\/g, "/"),
     },
     verificationStatus: 'PENDING',
   });
@@ -83,9 +86,14 @@ export const updateVerificationStatusService = async (
   const { verificationStatus, rejectionReason } = data;
 
   const allowedStatuses = ['VERIFIED', 'REJECTED', 'DISBURSED'];
-  if (!allowedStatuses.includes(verificationStatus)) {
+
+if (!verificationStatus || !allowedStatuses.includes(verificationStatus)) {
     throw { status: 400, message: `Invalid status. Allowed: ${allowedStatuses.join(', ')}` };
   }
+  
+  // if (!allowedStatuses.includes(verificationStatus)) {
+  //   throw { status: 400, message: `Invalid status. Allowed: ${allowedStatuses.join(', ')}` };
+  // }
 
   if (!applicationId || !mongoose.Types.ObjectId.isValid(applicationId)) {
     throw { status: 400, message: 'Invalid application ID.' };

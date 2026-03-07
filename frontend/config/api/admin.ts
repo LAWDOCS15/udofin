@@ -81,11 +81,21 @@
 import api from "@/config/axios";
 
 export const adminAPI = {
-  getDashboardData: () => api.get("/api/admin/dashboard-data"),
+  // getDashboardData: () => api.get("/api/admin/dashboard-data"),
   
-  // Naya endpoint NBFCs ki list laane ke liye
+  getDashboardData: () => api.get('/api/admin/dashboard/stats'),
+  getTickets: () => api.get('/api/admin/support/tickets'),
+  replyToTicket: (data: { ticketId: string, message: string }) => api.post('/api/admin/support/reply', data),
   getNbfcs: () => api.get("/api/admin/nbfcs"), 
   
   createNbfc: (payload: any) => api.post("/api/admin/create-nbfc", payload),
   createNbfcAdmin: (payload: any) => api.post("/api/admin/create-nbfc-admin", payload),
+
+  getAuditLogs: () => api.get('/api/admin/logs'),
+  getSettings: () => api.get('/api/admin/settings'),
+  updateSettings: (payload: any) => api.put('/api/admin/settings', payload),
+  getUsers: () => api.get('/api/admin/users'),
+  getApplications: () => api.get('/api/admin/applications'),
+  deleteNbfc: (id: string) => api.delete(`/api/admin/nbfcs/${id}`),
+  updateTicketStatus: (id: string, status: string) => api.patch(`/api/admin/support/tickets/${id}/status`, { status }),
 };

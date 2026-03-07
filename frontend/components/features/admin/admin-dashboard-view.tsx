@@ -1,269 +1,11 @@
-// "use client";
-
-// import { StatsCard } from "@/components/shared/stats-card";
-// import { cn } from "@/lib/utils";
-// import {
-//   FileText,
-//   Users,
-//   DollarSign,
-//   TrendingUp,
-//   ArrowUpRight,
-//   ArrowDownRight,
-//   Building2,
-//   Clock,
-// } from "lucide-react";
-// import type { AdminDashboardStats } from "@/types";
-
-// interface MonthlyChartEntry {
-//   month: string;
-//   applications: number;
-//   approved: number;
-//   disbursed: number;
-// }
-
-// const STATS: AdminDashboardStats = {
-//   totalUsers: 8932,
-//   totalApplications: 1284,
-//   activeLoans: 542,
-//   totalDisbursed: 425000000,
-//   revenue: 12500000,
-//   approvalRate: 87.3,
-//   totalNBFCs: 30,
-//   activeNBFCs: 24,
-//   newUsersThisMonth: 312,
-//   newUsersToday: 47,
-//   pendingApplications: 156,
-//   rejectedToday: 8,
-// };
-
-// const RECENT_ACTIVITIES = [
-//   {
-//     text: "Virendra Singh's loan of ₹8L approved",
-//     time: "2 min ago",
-//     type: "success" as const,
-//   },
-//   {
-//     text: "NBFC partner 'QuickLend' onboarded",
-//     time: "15 min ago",
-//     type: "info" as const,
-//   },
-//   {
-//     text: "Priya Sharma's application under review",
-//     time: "1 hour ago",
-//     type: "warning" as const,
-//   },
-//   {
-//     text: "3 KYC documents verified",
-//     time: "2 hours ago",
-//     type: "info" as const,
-//   },
-//   {
-//     text: "Monthly report generated",
-//     time: "3 hours ago",
-//     type: "info" as const,
-//   },
-// ];
-
-// const MONTHLY_DATA: MonthlyChartEntry[] = [
-//   { month: "Jan", applications: 180, approved: 156, disbursed: 140 },
-//   { month: "Feb", applications: 210, approved: 182, disbursed: 165 },
-//   { month: "Mar", applications: 245, approved: 210, disbursed: 190 },
-//   { month: "Apr", applications: 198, approved: 168, disbursed: 155 },
-//   { month: "May", applications: 280, approved: 248, disbursed: 220 },
-//   { month: "Jun", applications: 310, approved: 270, disbursed: 245 },
-// ];
-
-// export function AdminDashboardView() {
-//   const maxApps = Math.max(...MONTHLY_DATA.map((d) => d.applications));
-
-//   return (
-//     <div className="p-6 lg:p-8 space-y-6">
-//       <div>
-//         <h1
-//           className="text-2xl font-bold text-foreground"
-//           style={{ fontFamily: "var(--font-heading)" }}
-//         >
-//           Dashboard Overview
-//         </h1>
-//         <p className="text-xs text-muted-foreground mt-1">
-//           Platform performance at a glance
-//         </p>
-//       </div>
-
-//       {/* Stats Grid */}
-//       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-//         <StatsCard
-//           title="Total Applications"
-//           value={STATS.totalApplications.toLocaleString("en-IN")}
-//           change="+12.5%"
-//           icon={FileText}
-//           accent
-//           idx={0}
-//         />
-//         <StatsCard
-//           title="Active Users"
-//           value={STATS.totalUsers.toLocaleString("en-IN")}
-//           change="+5.2%"
-//           icon={Users}
-//           accent
-//           idx={1}
-//         />
-//         <StatsCard
-//           title="Total Disbursed"
-//           value="₹42.5Cr"
-//           change="+18.3%"
-//           icon={DollarSign}
-//           idx={2}
-//         />
-//         <StatsCard
-//           title="Approval Rate"
-//           value={`${STATS.approvalRate}%`}
-//           change="+3.1%"
-//           icon={TrendingUp}
-//           idx={3}
-//         />
-//       </div>
-
-//       {/* Secondary Stats */}
-//       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-//         {[
-//           {
-//             label: "Active NBFCs",
-//             value: STATS.activeNBFCs,
-//             icon: Building2,
-//             color: "text-blue-500",
-//           },
-//           {
-//             label: "Pending Reviews",
-//             value: STATS.pendingApplications,
-//             icon: Clock,
-//             color: "text-yellow-500",
-//           },
-//           {
-//             label: "Rejected Today",
-//             value: STATS.rejectedToday,
-//             icon: ArrowDownRight,
-//             color: "text-red-500",
-//           },
-//           {
-//             label: "New Users Today",
-//             value: STATS.newUsersToday,
-//             icon: ArrowUpRight,
-//             color: "text-accent",
-//           },
-//         ].map((s) => (
-//           <div
-//             key={s.label}
-//             className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3"
-//           >
-//             <div
-//               className={cn(
-//                 "h-10 w-10 rounded-xl bg-secondary flex items-center justify-center",
-//                 s.color,
-//               )}
-//             >
-//               <s.icon className="h-5 w-5" />
-//             </div>
-//             <div>
-//               <p className="text-[10px] text-muted-foreground">{s.label}</p>
-//               <p className="text-lg font-bold text-foreground">{s.value}</p>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       <div className="grid gap-6 lg:grid-cols-5 ">
-//         {/* Chart Area */}
-//         <div className="lg:col-span-3 rounded-3xl border border-border bg-card p-6 shadow-sm">
-//           <h2
-//             className="text-base font-bold text-foreground mb-4"
-//             style={{ fontFamily: "var(--font-heading)" }}
-//           >
-//             Monthly Trends
-//           </h2>
-//           <div className="flex items-end gap-3 h-auto">
-//             {MONTHLY_DATA.map((d) => (
-//               <div
-//                 key={d.month}
-//                 className="flex-1 flex flex-col items-center gap-1"
-//               >
-//                 <div className="w-full flex flex-col gap-0.5">
-//                   <div
-//                     className="w-full rounded-t-md bg-accent/20"
-//                     style={{ height: `${(d.applications / maxApps) * 160}px` }}
-//                   />
-//                   <div
-//                     className="w-full rounded-b-md bg-accent"
-//                     style={{ height: `${(d.approved / maxApps) * 160}px` }}
-//                   />
-//                 </div>
-//                 <span className="text-[10px] text-muted-foreground">
-//                   {d.month}
-//                 </span>
-//               </div>
-//             ))}
-//           </div>
-//           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border">
-//             <div className="flex items-center gap-1.5">
-//               <div className="h-2.5 w-2.5 rounded-sm bg-accent/20" />
-//               <span className="text-[10px] text-muted-foreground">
-//                 Applications
-//               </span>
-//             </div>
-//             <div className="flex items-center gap-1.5">
-//               <div className="h-2.5 w-2.5 rounded-sm bg-accent" />
-//               <span className="text-[10px] text-muted-foreground">
-//                 Approved
-//               </span>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Recent Activity */}
-//         <div className="lg:col-span-2 rounded-3xl border border-border bg-card p-6 shadow-sm">
-//           <h2
-//             className="text-base font-bold text-foreground mb-4"
-//             style={{ fontFamily: "var(--font-heading)" }}
-//           >
-//             Recent Activity
-//           </h2>
-//           <div className="space-y-3">
-//             {RECENT_ACTIVITIES.map((a, i) => (
-//               <div key={i} className="flex items-start gap-3">
-//                 <div
-//                   className={cn(
-//                     "mt-1 h-2 w-2 rounded-full shrink-0",
-//                     a.type === "success"
-//                       ? "bg-accent"
-//                       : a.type === "warning"
-//                         ? "bg-yellow-500"
-//                         : "bg-blue-500",
-//                   )}
-//                 />
-//                 <div>
-//                   <p className="text-xs text-foreground">{a.text}</p>
-//                   <p className="text-[10px] text-muted-foreground">{a.time}</p>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { StatsCard } from "@/components/shared/stats-card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/shared/simple-toast"; 
 import { cn } from "@/lib/utils";
-import { adminAPI } from "@/config/api";
+import { adminAPI } from "@/config/api/admin"; 
 import {
   FileText, Users, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, 
   Building2, Clock, Plus, Loader2, UserPlus, X, AlertTriangle
@@ -277,17 +19,29 @@ interface MonthlyChartEntry {
   disbursed: number;
 }
 
-const MONTHLY_DATA: MonthlyChartEntry[] = [
-  { month: "Jan", applications: 180, approved: 156, disbursed: 140 },
-  { month: "Feb", applications: 210, approved: 182, disbursed: 165 },
-  { month: "Mar", applications: 245, approved: 210, disbursed: 190 },
-  { month: "Apr", applications: 198, approved: 168, disbursed: 155 },
-  { month: "May", applications: 280, approved: 248, disbursed: 220 },
-  { month: "Jun", applications: 310, approved: 270, disbursed: 245 },
-];
+// Fallback data if backend trends are empty
+// const FALLBACK_MONTHLY_DATA: MonthlyChartEntry[] = [
+//   { month: "Jan", applications: 180, approved: 156, disbursed: 140 },
+//   { month: "Feb", applications: 210, approved: 182, disbursed: 165 },
+// ];
+
+const getReadableAction = (rawAction: string, moduleName: string) => {
+  const action = rawAction?.toLowerCase() || "";
+  
+  if (action.includes("settings")) return "Updated Platform Settings";
+  if (action.includes("delete") && action.includes("nbfcs")) return "Deleted an NBFC Partner";
+  if (action.includes("create-nbfc-admin")) return "Created NBFC Admin Account";
+  if (action.includes("create-nbfc")) return "Onboarded New NBFC Partner";
+  if (action.includes("support/reply")) return "Replied to a Support Ticket";
+  if (action.includes("status") && action.includes("tickets")) return "Resolved/Closed a Support Ticket";
+
+  if (moduleName) return moduleName.replace(/_/g, ' '); 
+  return rawAction; 
+};
 
 export function AdminDashboardView() {
-  const { toast } = useToast();
+  const { showToast } = useToast(); 
+  
   const [isLoading, setIsLoading] = useState(true);
   const [showAddPartnerModal, setShowAddPartnerModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -302,31 +56,84 @@ export function AdminDashboardView() {
     newUsersThisMonth: 0, newUsersToday: 0, pendingApplications: 0, rejectedToday: 0,
   });
 
+  const [realUsersCount, setRealUsersCount] = useState(0); 
+  // const [monthlyData, setMonthlyData] = useState<MonthlyChartEntry[]>;
+  const [monthlyData, setMonthlyData] = useState<MonthlyChartEntry[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
   const fetchDashboardData = async () => {
     try {
-      const response = await adminAPI.getDashboardData();
-      const data = response.data;
+      setIsLoading(true);
+      const response = await adminAPI.getDashboardData(); 
+      const data = response.data.data || response.data; 
 
       setStats((prev) => ({
         ...prev,
-        totalApplications: data.stats.totalApplications || 0,
-        totalUsers: data.stats.activeUsers || 0,
-        approvalRate: parseFloat(data.stats.approvalRate) || 0,
-        pendingApplications: data.applications.filter((a: any) => a.status === 'pending').length,
+        totalApplications: data.totalApplications || 0,
+        totalUsers: (data.realUsers || 0) + (data.duplicateUsers || 0),
+        approvalRate: parseFloat(data.approvalRate) || 0,
+        pendingApplications: data.pendingReviews || 0,
+        rejectedToday: data.rejectedToday || 0,
+        newUsersToday: data.newUsersToday || 0,
+        activeNBFCs: data.activeNbfc || 0,
+        totalDisbursed: data.totalDisbursed || 0
       }));
 
-      const mappedActivities = data.applications.slice(0, 5).map((app: any) => ({
-        text: `${app.applicantName}'s application is ${app.status}`,
-        time: app.appliedDate,
-        type: app.status === 'approved' ? 'success' : app.status === 'rejected' ? 'warning' : 'info'
-      }));
+      setRealUsersCount(data.realUsers || 0);
+
+      if (data.trends && data.trends.length > 0) {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const mappedTrends = data.trends.map((t: any) => ({
+          month: monthNames[t._id.month - 1] || "Unknown",
+          applications: t.count,
+          approved: Math.floor(t.count * (parseFloat(data.approvalRate) / 100)) || 0, 
+          disbursed: 0
+        }));
+        setMonthlyData(mappedTrends);
+      }
+
+      // setRecentActivities([]); 
+      // Fetch Audit logs for recent activity
+  //     const logsRes = await adminAPI.getAuditLogs();
+  //     if (logsRes.data && logsRes.data.length > 0) {
+  //       const mappedLogs = logsRes.data.slice(0, 5).map((l: any) => ({
+  //         text: l.action,
+  //         time: new Date(l.createdAt).toLocaleTimeString(),
+  //         type: l.action.includes("create") ? "success" : "info"
+  //       }));
+  //       setRecentActivities(mappedLogs);
+  //     }
+
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     showToast("Failed to load live dashboard data", "error"); 
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+try {
+        const logsRes = await adminAPI.getAuditLogs();
+        const fetchedLogs = logsRes.data?.logs || logsRes.data || [];
+        if (fetchedLogs.length > 0) {
+          const mappedLogs = fetchedLogs.slice(0, 5).map((l: any) => {
+            const isDelete = l.action?.toLowerCase().includes("delete");
+            return {
+              text: getReadableAction(l.action, l.module), // 👈 English text applied here
+              time: new Date(l.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+              type: isDelete ? "warning" : "info" // Red for delete, Blue for others
+            }
+          });
+          setRecentActivities(mappedLogs);
+        }
+      } catch (logErr) {
+        console.error("Could not fetch recent activities");
+      }
       
-      setRecentActivities(mappedActivities);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ title: "Error", description: "Failed to load live data", variant: "destructive" });
+      showToast("Failed to load live dashboard data", "error"); 
     } finally {
       setIsLoading(false);
     }
@@ -353,18 +160,22 @@ export function AdminDashboardView() {
         nbfcId: nbfcRes.data.nbfcId 
       });
 
-      toast({ title: "Success", description: "Partner NBFC created successfully!" });
+      // 4.  CHANGED: Success message in new format
+      showToast("Partner NBFC created successfully!", "success");
+      
       setShowAddPartnerModal(false);
       setPartnerForm({ nbfcName: "", registrationNumber: "", adminName: "", adminEmail: "", adminPassword: "" });
+      fetchDashboardData(); 
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || "Failed to create partner";
-      toast({ title: "Error", description: errorMsg, variant: "destructive" });
+      // 5.  CHANGED: Error message in new format
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const maxApps = Math.max(...MONTHLY_DATA.map((d) => d.applications));
+  const maxApps = Math.max(...monthlyData.map((d) => d.applications), 10); 
 
   if (isLoading) {
     return <div className="min-h-[60vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -377,10 +188,10 @@ export function AdminDashboardView() {
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: "var(--font-heading)" }}>
             Dashboard Overview
             <span className="px-2 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" /> Simulated KYC
+              <AlertTriangle className="h-3 w-3" /> Live Data
             </span>
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">Platform performance at a glance</p>
+          <p className="text-xs text-muted-foreground mt-1">Platform performance at a glance (Unique Users: {realUsersCount})</p>
         </div>
         <Button onClick={() => setShowAddPartnerModal(true)} className="gap-2 shadow-sm rounded-xl">
           <Plus className="h-4 w-4" /> Add NBFC Partner
@@ -390,7 +201,7 @@ export function AdminDashboardView() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total Applications" value={stats.totalApplications.toLocaleString("en-IN")} change="Live" icon={FileText} accent idx={0} />
         <StatsCard title="Active Users" value={stats.totalUsers.toLocaleString("en-IN")} change="Live" icon={Users} accent idx={1} />
-        <StatsCard title="Total Disbursed" value="₹0.0" change="Pending Module" icon={DollarSign} idx={2} />
+        <StatsCard title="Total Disbursed" value={`₹${stats.totalDisbursed.toLocaleString("en-IN")}`} change="Live" icon={DollarSign} idx={2} />
         <StatsCard title="Approval Rate" value={`${stats.approvalRate}%`} change="Live" icon={TrendingUp} idx={3} />
       </div>
 
@@ -417,7 +228,7 @@ export function AdminDashboardView() {
         <div className="lg:col-span-3 rounded-3xl border border-border bg-card p-6 shadow-sm">
           <h2 className="text-base font-bold text-foreground mb-4" style={{ fontFamily: "var(--font-heading)" }}>Monthly Trends</h2>
           <div className="flex items-end gap-3 h-auto">
-            {MONTHLY_DATA.map((d) => (
+            {monthlyData.map((d) => (
               <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
                 <div className="w-full flex flex-col gap-0.5">
                   <div className="w-full rounded-t-md bg-accent/20" style={{ height: `${(d.applications / maxApps) * 160}px` }} />
@@ -445,7 +256,7 @@ export function AdminDashboardView() {
                 </div>
               </div>
             ))}
-            {recentActivities.length === 0 && <p className="text-xs text-muted-foreground">No recent activity.</p>}
+            {recentActivities.length === 0 && <p className="text-xs text-muted-foreground">Live activity log connected (Waiting for new events...)</p>}
           </div>
         </div>
       </div>
