@@ -73,10 +73,49 @@
 // };
 
 
-// frontend/config/api/nbfc.ts
+
+
+
+// // frontend/config/api/nbfc.ts
+// import api from "@/config/axios";
+
+// export const nbfcAPI = {
+//   getLeads: () => api.get("/api/applications/leads"),
+//   updateApplicationStatus: (appId: string, payload: any) => api.patch(`/api/applications/${appId}/status`, payload),
+// };
+
+
+
+
+
 import api from "@/config/axios";
 
 export const nbfcAPI = {
+  // 1. Applications & Leads
   getLeads: () => api.get("/api/applications/leads"),
-  updateApplicationStatus: (appId: string, payload: any) => api.patch(`/api/applications/${appId}/status`, payload),
+  
+  // 2. Customers List (Active Customers)
+  getCustomers: () => api.get("/api/nbfc/customers"), 
+
+  // 3. Dashboard Stats (Summary counts)
+  getStats: () => api.get("/api/nbfc/stats"), 
+
+  // 4. Loan Disbursement
+  disburseLoan: (applicationId: string) => 
+    api.post("/api/nbfc/disburse", { applicationId }),
+
+  // 5. EMI Management
+  // Dashboard ke chote card ke liye
+  getUpcomingEmis: () => api.get("/api/nbfc/emis/upcoming"),
+  
+  // EMI Tracker Page ke liye (Full Data)
+  getTrackerData: () => api.get("/api/nbfc/emis/tracker"),
+
+  // EMI Payment Update
+  markEmiAsPaid: (emiId: string, paymentData: { paymentMethod: string; transactionId: string }) => 
+    api.patch("/api/nbfc/emis/pay", { emiId, ...paymentData }),
+
+  // 6. Application Status (General Updates)
+  updateApplicationStatus: (appId: string, payload: any) => 
+    api.patch(`/api/applications/${appId}/status`, payload),
 };

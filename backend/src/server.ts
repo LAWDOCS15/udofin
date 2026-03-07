@@ -8,27 +8,23 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import nbfcRoutes from './routes/nbfc.routes';
 
 import { connectDB } from './config/db';
 import authRoutes from './routes/auth.routes';
 import applicationRoutes from './routes/application.routes';
 import adminRoutes from './routes/admin.routes';
 
-  //  ENV CONFIG
 
 if (!process.env.PORT) {
   console.warn('⚠️ PORT not defined, using default 5000');
 }
-  //  APP INITIALIZATION
 
 const app: Application = express();
 
-// SECURITY MIDDLEWARE
 
-// Secure HTTP headers
 app.use(helmet());
 
-// Rate limiting (prevent brute force & abuse)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -37,7 +33,6 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// CORS configuration
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -45,37 +40,32 @@ app.use(
   })
 );
 
-  //  STANDARD MIDDLEWARE
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Logging (only in development)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-  //  STATIC FILES
 
 app.use(
   '/uploads',
   express.static(path.join(__dirname, '../uploads'))
 );
 
-  //  ROUTES
 
 app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/nbfc', nbfcRoutes); 
 
-  //  HEALTH CHECK
 
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'OK' });
 });
 
-  //  404 HANDLER
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -83,7 +73,6 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-  //  GLOBAL ERROR HANDLER
 
 app.use(
   (
@@ -100,7 +89,6 @@ app.use(
   }
 );
 
-  //  SERVER START
 
 const PORT = process.env.PORT
   ? Number(process.env.PORT)
@@ -120,4 +108,4 @@ const startServer = async (): Promise<void> => {
   }
 };
 
-startServer();
+startServer(); 
