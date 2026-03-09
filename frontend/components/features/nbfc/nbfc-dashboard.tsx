@@ -149,14 +149,12 @@ export function NbfcDashboardView() {
         const emis = emiRes.value.data?.emis || emiRes.value.data || [];
         setUpcomingEmis(Array.isArray(emis) ? emis : []);
       }
-
       if (statsRes.status === 'fulfilled' && statsRes.value.data) {
         const s = statsRes.value.data;
-        
         setStats({
           totalApplications: s.totalApplications || s.totalLoans || 0,
           totalLoans: s.totalLoans || 0,
-          runningLoans: s.runningLoans || 0,
+          runningLoans: s.activeCustomers || 0, 
           completedLoans: s.completedLoans || 0,
           totalDisbursed: s.totalDisbursed || 0,
           emiExpectedToday: s.emiExpectedToday || 0,
